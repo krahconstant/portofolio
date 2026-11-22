@@ -72,6 +72,10 @@
   .hero-social{display:flex;gap:1.5rem;margin-top:2rem;font-family:var(--mono);font-size:.78rem;color:var(--text2)}
   .hero-social a{text-decoration:none;transition:color .2s}
   .hero-social a:hover{color:var(--accent)}
+  .hero-social{flex-wrap:wrap}
+  .visits{display:inline-flex;align-items:center;gap:.5rem}
+  .visits i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+  .visits b{color:var(--accent);font-weight:400}
 
   /* PHOTO */
   .photo-wrap{position:relative;justify-self:center;width:min(100%,340px)}
@@ -221,6 +225,7 @@
       <a href="mailto:krahtino65@gmail.com">krahtino65@gmail.com</a>
       <a href="https://www.linkedin.com/in/kobenan-krah/" target="_blank" rel="noopener">LinkedIn</a>
       <span>Abidjan, CI</span>
+      <span class="visits" id="visits" hidden><i></i><b id="visit-count">0</b> <span id="visit-label">visites</span></span>
     </div>
   </div>
 
@@ -328,6 +333,31 @@
      Réception des messages par email : créez une clé gratuite sur https://web3forms.com
      (saisissez krahtino65@gmail.com, la clé arrive par mail) et collez-la ci-dessous. */
   const WEB3FORMS_KEY = "ae58f28f-67ed-4d96-8641-98f51f6b93c1";
+
+  // Compteur de visites (GoatCounter)
+  // Remplacez COLLEZ_VOTRE_CODE par le code choisi à l'inscription sur goatcounter.com
+  // (ex. "krahconstant" si votre adresse est krahconstant.goatcounter.com)
+  const GOATCOUNTER_CODE = "tino";
+  (function () {
+    if (GOATCOUNTER_CODE === "COLLEZ_VOTRE_CODE") return; // compteur masqué tant que non configuré
+    // 1) Enregistre la visite
+    const sc = document.createElement('script');
+    sc.async = true; sc.src = '//gc.zgo.at/count.js';
+    sc.dataset.goatcounter = 'https://' + GOATCOUNTER_CODE + '.goatcounter.com/count';
+    document.head.appendChild(sc);
+    // 2) Affiche le total
+    const box = document.getElementById('visits'), num = document.getElementById('visit-count'), lab = document.getElementById('visit-label');
+    async function read() {
+      try {
+        const r = await fetch('https://' + GOATCOUNTER_CODE + '.goatcounter.com/counter/TOTAL.json');
+        if (!r.ok) return;
+        const j = await r.json();
+        num.textContent = j.count; lab.textContent = 'visites'; box.hidden = false;
+      } catch (_) {}
+    }
+    setTimeout(read, 1500);
+    setInterval(() => { if (!document.hidden) read(); }, 60000);
+  })();
 
   // Menu mobile
   const menuBtn = document.getElementById('menu-btn'), links = document.getElementById('nav-links');
