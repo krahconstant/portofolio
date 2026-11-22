@@ -10,6 +10,7 @@
 <meta property="og:description" content="Détection, réponse aux incidents et automatisation SOAR. Master en Sécurité de l'Information (ESATIC).">
 <meta property="og:type" content="website">
 <meta property="og:image" content="photo.jpg">
+<script>document.documentElement.classList.add("js")</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0c10'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' fill='%2300ffe0' text-anchor='middle'%3EKC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,8 +161,13 @@
   .cursor{display:inline-block;width:3px;height:.85em;background:var(--accent);margin-left:4px;vertical-align:middle;animation:blink 1s infinite}
   .fade-up{opacity:0;animation:fadeUp .7s ease forwards}
   .d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}.d5{animation-delay:.5s}.d6{animation-delay:.6s}
-  .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.in{opacity:1;transform:none}
+  .js .reveal{opacity:0;transform:translateY(40px);filter:blur(4px);
+    transition:opacity .9s cubic-bezier(.2,.7,.2,1) var(--d,0s),transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s),filter .9s ease var(--d,0s),border-color .3s,background .3s,box-shadow .3s}
+  .js .reveal.from-left{transform:translateX(-50px)}
+  .js .reveal.from-right{transform:translateX(50px)}
+  .js .reveal.in{opacity:1;transform:none;filter:none}
+  .js .skill-card.in:hover,.js .project-item.in:hover{transform:translateY(-3px)}
+  .progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:200;box-shadow:0 0 10px var(--accent)}
 
   @media(max-width:900px){
     #hero{grid-template-columns:1fr;gap:3rem;padding-top:7rem}
@@ -181,6 +187,7 @@
 </style>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 
 <nav>
   <a href="#hero" class="nav-logo">KKC_SEC</a>
@@ -330,9 +337,28 @@
   });
   links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
 
-  // Apparition au scroll
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .1 });
+  // Apparition progressive au défilement
+  document.querySelectorAll('.stat-box,.edu > div,.contact-link,.form-group,.contact-form button,.form-note,footer p').forEach(el => el.classList.add('reveal'));
+  document.querySelectorAll('.about-text,.contact-info').forEach(el => el.classList.add('from-left'));
+  document.querySelectorAll('.contact-form').forEach(el => el.classList.add('from-right'));
+  // Décalage en cascade des éléments d'un même groupe
+  document.querySelectorAll('.about-stats,.edu,.skills-grid,.projects-list,.contact-links,.contact-form').forEach(g => {
+    [...g.children].filter(c => c.classList.contains('reveal')).forEach((c, i) => c.style.setProperty('--d', (i * 0.12) + 's'));
+  });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in'); io.unobserve(e.target);
+      setTimeout(() => e.target.style.removeProperty('--d'), 1600);
+    }
+  }), { threshold: .12, rootMargin: '0px 0px -8% 0px' });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Barre de progression
+  const bar = document.getElementById('progress');
+  addEventListener('scroll', () => {
+    const h = document.documentElement;
+    bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+  }, { passive: true });
 
   // Lien actif dans la nav
   const navA = [...links.querySelectorAll('a')];
